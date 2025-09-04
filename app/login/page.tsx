@@ -1,7 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -12,14 +17,10 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
 
-    const supabase = createClient();
-
-    // URL de base pour la redirection (prod = Vercel, sinon origine courante)
     const base =
       process.env.NEXT_PUBLIC_SITE_URL ||
       (typeof window !== 'undefined' ? window.location.origin : '');
 
-    // Route de callback prévue dans ton projet (app/auth/callback/route.ts)
     const redirectTo = `${base}/auth/callback`;
 
     const { error } = await supabase.auth.signInWithOtp({
@@ -28,21 +29,15 @@ export default function LoginPage() {
     });
 
     setLoading(false);
-    if (error) {
-      alert(error.message);
-    } else {
-      setSent(true);
-    }
+    if (error) alert(error.message);
+    else setSent(true);
   }
 
   return (
     <main className="p-6 max-w-sm mx-auto">
       <h1 className="text-2xl font-bold mb-4">Connexion</h1>
-
       {sent ? (
-        <p>
-          Un lien magique vient d’être envoyé à <b>{email}</b>. Vérifie ta boîte mail ✉️
-        </p>
+        <p>Un lien magique vient d’être envoyé à <b>{email}</b>. Vérifie ta boîte mail ✉️</p>
       ) : (
         <form onSubmit={onSubmit} className="space-y-3">
           <input

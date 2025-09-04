@@ -14,12 +14,12 @@ export default function LoginPage() {
 
     const supabase = createClient();
 
-    // URL de redirection pour le lien magique (prod → Vercel, sinon origine courante)
+    // URL de base pour la redirection (prod = Vercel, sinon origine courante)
     const base =
       process.env.NEXT_PUBLIC_SITE_URL ||
       (typeof window !== 'undefined' ? window.location.origin : '');
 
-    // On utilise la route /auth/callback prévue dans ton projet
+    // Route de callback prévue dans ton projet (app/auth/callback/route.ts)
     const redirectTo = `${base}/auth/callback`;
 
     const { error } = await supabase.auth.signInWithOtp({
@@ -40,7 +40,9 @@ export default function LoginPage() {
       <h1 className="text-2xl font-bold mb-4">Connexion</h1>
 
       {sent ? (
-        <p>Un lien magique vient d’être envoyé à <b>{email}</b>. Vérifie ta boîte mail ✉️</p>
+        <p>
+          Un lien magique vient d’être envoyé à <b>{email}</b>. Vérifie ta boîte mail ✉️
+        </p>
       ) : (
         <form onSubmit={onSubmit} className="space-y-3">
           <input
@@ -55,7 +57,7 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full rounded bg-black text-white p-2 disabled:opacity-50"
           >
-            {loading ? 'Envoi...' : 'Recevoir le lien'}
+            {loading ? 'Envoi…' : 'Recevoir le lien'}
           </button>
         </form>
       )}

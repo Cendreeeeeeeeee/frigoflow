@@ -2,20 +2,26 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@supabase/supabase-js';
 
-export default function HomeRedirect() {
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+export default function AppPage() {
   const router = useRouter();
 
   useEffect(() => {
     (async () => {
-      const supabase = createClient();
-
-      // 1) session/user
+      // Vérifie si l’utilisateur est connecté
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.replace('/login'); return; }
+      if (!user) {
+        router.replace('/login');
+        return;
+      }
 
-      // 2) membre de famille ?
+      // Vérifie si l’utilisateur a une famille associée
       const { data: member, error } = await supabase
         .from('members')
         .select('family_id')
@@ -24,7 +30,7 @@ export default function HomeRedirect() {
 
       if (error) {
         console.error(error);
-        router.replace('/login'); // fallback safe
+        router.replace('/login');
         return;
       }
 
@@ -33,10 +39,10 @@ export default function HomeRedirect() {
         return;
       }
 
-      // 3) ok → app
+      // Si tout est OK, envoie l’utilisateur vers la vraie app
       router.replace('/app');
     })();
   }, [router]);
 
-  return null; // simple redirector
+  return <p>Chargement...</p>;
 }

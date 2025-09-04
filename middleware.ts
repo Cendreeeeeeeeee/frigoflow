@@ -1,11 +1,10 @@
-import type { NextRequest } from "next/server"
-import { NextResponse } from "next/server"
-
-export async function middleware(request: NextRequest) {
-  // Authentication will be handled directly in pages instead
-  return NextResponse.next()
-}
+// middleware.ts — safe (aucune redirection, juste passe-plat sur les routes privées)
+import { NextResponse } from 'next/server';
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
+  matcher: ['/app/:path*', '/list/:path*', '/settings/:path*'],
+};
+
+export function middleware() {
+  return NextResponse.next();
 }
